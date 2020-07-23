@@ -25,7 +25,12 @@ path.spiral {
   stroke: #ee8d18;
   stroke-width: 3px;
 }
-
+svg{
+  background-image: linear-gradient(to top, rgba(253, 194, 49, 0.37) -13%, #f6f4e5 32%, #1da4a8 100%);
+  border-radius: 0.25rem;
+  padding-left:4rem;
+  padding-top:4rem;
+}
 
 .tooltip {
   background: #eee;

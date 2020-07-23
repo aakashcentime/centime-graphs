@@ -1,0 +1,248 @@
+import React, {useRef, useEffect, useState} from 'react';
+import './App.css';
+import * as d3 from 'd3';
+
+
+
+
+function Spiral(data) {
+    const N = 300;
+    let [someData, setSomeData] = useState([]);
+    let [spiralRef, setSpiralRef] = useState([]);
+    const [textvalue,setTextvalue] = useState("empty now");
+    if(data && someData.length===0){
+        console.log("DATA : ",data);
+        setSomeData(data);
+    }
+    console.log('Ref:',spiralRef);
+
+    useEffect(()=>{
+        console.log('Some Data:',someData);
+        if(someData.length > 0) {
+            console.log(svgRef);
+            // let svg = d3.select(svgRef.current);
+            // svg.selectAll("circle").data(data)
+            //     .join("circle")
+            //     .attr("r", value => value)
+            //     .attr("cx", value => value * 2)
+            //     .attr("cy", value => value * 2)
+            //     .attr("stroke", "red");
+
+            let width = 600,
+                height = 600,
+                start = 0,
+                end = 2.25,
+                numSpirals = 3
+            let margin = {top: 50, bottom: 50, left: 50, right: 50};
+
+            let theta = function (r) {
+                return numSpirals * Math.PI * r;
+            };
+            //let colors = ["#5c9851","#5c9851","#5c9851","#5c9851","#BBBBBB"];
+            let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
+            // used to assign nodes color by group
+            // let color = d3.scaleOrdinal(d3.schemeCategory10);
+
+            let r = d3.min([width, height]) / 2 - 40;
+
+            let radius = d3.scaleLinear()
+                .domain([start, end])
+                .range([40, r]);
+
+            let svg = d3.select("#chart").append("svg")
+                .attr("width", width + margin.right + margin.left)
+                .attr("height", height + margin.left + margin.right)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+            // svg.selectAll("*").remove();
+
+            let points = d3.range(start, end + 0.001, (end - start) / 1000);
+
+            let spiral = d3.radialLine()
+                .curve(d3.curveCardinal)
+                .angle(theta)
+                .radius(radius);
+
+            let path = svg.append("path")
+                .datum(points)
+                .attr("id", "spiral")
+                .attr("d", spiral)
+                .style("fill", "none")
+                .style("stroke", "steelblue");
+
+            console.log('Path:', path);
+
+            let spiralLength = path.node().getTotalLength(),
+                barWidth = (spiralLength / N) - 1;
+            // setSomeData(tempArray1);
+
+            var timeScale = d3.scaleTime()
+                .domain(d3.extent(someData, function (d) {
+                    return d.date;
+                }))
+                .range([0, spiralLength]);
+
+            // yScale for the bar height
+            let yScale = d3.scaleLinear()
+                .domain([0, d3.max(someData, function (d) {
+                    return d.value;
+                })])
+                .range([0, (r / numSpirals) - 30]);
+
+            svg.selectAll("rect")
+                .data(someData)
+                .enter()
+                .append("rect")
+                .attr("x", function (d, i) {
+
+                    let linePer = timeScale(d.date),
+                        posOnLine = path.node().getPointAtLength(spiralLength - (spiralLength / N) * i),
+                        angleOnLine = path.node().getPointAtLength(spiralLength - (spiralLength / N) * i - barWidth);
+
+                    console.log('Line Per:', linePer);
+                    d.linePer = linePer; // % distance are on the spiral
+                    d.x = posOnLine.x; // x postion on the spiral
+                    d.y = posOnLine.y; // y position on the spiral
+                    console.log(
+                        d.x, d.y
+                    )
+                    d.a = (Math.atan2(angleOnLine.y, angleOnLine.x) * 180 / Math.PI) - 90; //angle at the spiral position
+
+                    return d.x;
+                })
+                .attr("y", function (d) {
+                    return d.y;
+                })
+                .attr("width", function (d) {
+                    return barWidth;
+                })
+                .attr("height", function (d) {
+                    return yScale(d.value);
+                })
+                .style("fill", function (d) {
+                    console.log(d.date.getMonth());
+                    //let rand = d.date.getMonth()%colors.length;
+                    // if(d.value%2==0){
+                    //     console.log("at line")
+                    //     return "#FFAD113E"}
+                    // return color(d.group);})
+                    return Math.random() >= 0.5 ? "#840e0e" : "rgb(46,153,0)"
+                })
+                .style("stroke", "none")
+                .attr("transform", function (d) {
+                    return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
+                });
+
+            // add date labels
+            let tF = d3.timeFormat("%b %Y"),
+                firstInMonth = {};
+
+            svg.selectAll("text")
+                .data(someData)
+                .enter()
+                .append("text")
+                .attr("dy", 10)
+                .style("text-anchor", "start")
+                .style("font", "10px arial")
+                .append("textPath")
+                // only add for the first of each month
+                .filter(function (d) {
+                    let sd = tF(d.date);
+                    // const [stateofdate,setdate] = useState();
+                    // if(d.date==preveDate){return false;}// let sd = d.date.getMonth()
+                    if (!firstInMonth[sd]) {
+                        firstInMonth[sd] = 1;
+                        return true;
+                    }
+                    return true;
+                })
+                .text(function (d) {
+                    let month = d.date.getMonth()
+
+                    return months[month] + " " + d.date.getDay();
+                })
+                // place text along spiral
+                .attr("xlink:href", "#spiral")
+                .style("fill", "grey")
+                .attr("startOffset", function (d) {
+                    return ((d.linePer / spiralLength) * 100) + "%";
+                })
+
+
+            let tooltip = d3.select("#chart")
+                .append('div')
+                .attr('class', 'tooltip');
+
+            tooltip.append('div')
+                .attr('class', 'date');
+            tooltip.append('div')
+                .attr('class', 'value');
+
+            svg.selectAll("rect")
+                .on('mouseover', function (d) {
+
+                    tooltip.select('.date').html("Date: <b>" + d.date.toDateString() + "</b>");
+                    tooltip.select('.value').html("Value: <b>" + Math.round(d.value * 100) / 100 + "<b>");
+
+                    d3.select(this)
+                        .style("fill", "#FFFFFF")
+                        .style("stroke", "#000000")
+                        .style("stroke-width", "2px");
+
+                    tooltip.style('display', 'block');
+                    tooltip.style('opacity', 2);
+
+                })
+                .on('mousemove', function (d) {
+                    tooltip.style('top', (d3.event.layerY + 10) + 'px')
+                        .style('left', (d3.event.layerX - 25) + 'px');
+                })
+                .on('mouseout', function (d) {
+                    console.log("value of d ", d)
+                    d3.selectAll("rect")
+                        .style("fill", function (d) {
+                            return d.value > .5 ? "#840e0e" : "rgb(46,153,0)"
+                        })
+                        .style("stroke", "none")
+                    tooltip.style('display', 'none');
+                    tooltip.style('opacity', 0);
+                }).on('click', function (d) {
+                console.log(d);
+                setTextvalue(JSON.stringify(d));
+            });
+        }
+
+    },[spiralRef]);
+
+    const svgRef = useRef();
+
+    const loadingFunction = () =>{
+        return [{"success":true,"height":500},{"success":false,"height":600}]
+    }
+    const myfunc = () => {
+
+         /*document.getElementById('chart').innerHTML="";
+         d3.selectAll("svg > *").remove();*/
+
+        let randomVar = Math.floor(Math.random() * 4);
+        console.log("randon",randomVar)
+
+        let tempArray =[];
+        for (let i = 0; i <100; i++) {
+            let currentDate = new Date();
+            currentDate.setDate(currentDate.getDate() - i);
+            console.log("in button",currentDate)
+            tempArray.push({
+                date: currentDate,
+                value: Math.random(),
+                group: currentDate.getMonth()
+            });
+        }
+        console.log(tempArray)
+        setSomeData(tempArray);
+    };
+
+    return (<div><div ref={r=>setSpiralRef(r)} id="chart"></div><button onClick={myfunc}>hello</button></div>);
+}
+
+export default Spiral;
