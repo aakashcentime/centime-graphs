@@ -183,42 +183,43 @@ function App() {
         })
 
 
-    // let tooltip = d3.select("#chart")
-    //     .append('div')
-    //     .attr('class', 'tooltip');
-    //
-    // tooltip.append('div')
-    //     .attr('class', 'date');
-    // tooltip.append('div')
-    //     .attr('class', 'value');
-    //
-    // svg.selectAll("rect")
-    //     .on('mouseover', function(d) {
-    //
-    //       tooltip.select('.date').html("Date: <b>" + d.date.toDateString() + "</b>");
-    //       tooltip.select('.value').html("Value: <b>" + Math.round(d.value*100)/100 + "<b>");
-    //
-    //       d3.select(this)
-    //           .style("fill","#FFFFFF")
-    //           .style("stroke","#000000")
-    //           .style("stroke-width","2px");
-    //
-    //       tooltip.style('display', 'block');
-    //       tooltip.style('opacity',2);
-    //
-    //     })
-    //     .on('mousemove', function(d) {
-    //       tooltip.style('top', (d3.event.layerY + 10) + 'px')
-    //           .style('left', (d3.event.layerX - 25) + 'px');
-    //     })
-    //     .on('mouseout', function(d) {
-    //       d3.selectAll("rect")
-    //           .style("fill", function(d){return color(d.group);})
-    //           .style("stroke", "none")
-    //
-    //       tooltip.style('display', 'none');
-    //       tooltip.style('opacity',0);
-    //     });
+    let tooltip = d3.select("#chart")
+        .append('div')
+        .attr('class', 'tooltip');
+
+    tooltip.append('div')
+        .attr('class', 'date');
+    tooltip.append('div')
+        .attr('class', 'value');
+
+    svg.selectAll("rect")
+        .on('mouseover', function(d) {
+
+          tooltip.select('.date').html("Date: <b>" + d.date.toDateString() + "</b>");
+          tooltip.select('.value').html("Value: <b>" + Math.round(d.value*100)/100 + "<b>");
+
+          d3.select(this)
+              .style("fill","#FFFFFF")
+              .style("stroke","#000000")
+              .style("stroke-width","2px");
+
+          tooltip.style('display', 'block');
+          tooltip.style('opacity',2);
+
+        })
+        .on('mousemove', function(d) {
+          tooltip.style('top', (d3.event.layerY + 10) + 'px')
+              .style('left', (d3.event.layerX - 25) + 'px');
+        })
+        .on('mouseout', function(d) {
+            console.log("value of d ", d)
+          d3.selectAll("rect")
+              .style("fill", function(d){return d.value > .5 ? "#840e0e" : "rgb(46,153,0)"})
+              .style("stroke", "none")
+
+          tooltip.style('display', 'none');
+          tooltip.style('opacity',0);
+        });
 
   },[someData]);
 
