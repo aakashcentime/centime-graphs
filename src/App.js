@@ -114,7 +114,7 @@ function App() {
 
           let linePer = timeScale(d.date),
               posOnLine = path.node().getPointAtLength(spiralLength- (spiralLength/N)*i),
-              angleOnLine = path.node().getPointAtLength(linePer - barWidth);
+              angleOnLine = path.node().getPointAtLength(spiralLength - (spiralLength/N)*i - barWidth);
 
           d.linePer = linePer; // % distance are on the spiral
           d.x = posOnLine.x; // x postion on the spiral
