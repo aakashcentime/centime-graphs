@@ -9,7 +9,7 @@ function App() {
 
   const [data, setData] = useState([12,23,25,34,45]);
   const [width , setWidth] = useState(500);
-  let N = 300;
+  const N = 300;
   let [someData, setSomeData] = useState([]);
 
   function f(){
@@ -62,9 +62,9 @@ function App() {
         .attr("height", height + margin.left + margin.right)
         .append("g")
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-      svg.selectAll("*").remove();
+      // svg.selectAll("*").remove();
 
-    let points = d3.range(start, end + 0.001, (end - start) / 300);
+    let points = d3.range(start, end + 0.001, (end - start) / 1000);
 
     let spiral = d3.radialLine()
         .curve(d3.curveCardinal)
@@ -93,12 +93,11 @@ function App() {
     }
    // setSomeData(tempArray1);
 
-
-    let timeScale = d3.scaleTime()
-        .domain(d3.extent(someData, function(d){
-          return d.date;
-        }))
-        .range([0, spiralLength]);
+      var timeScale = d3.scaleTime()
+          .domain(d3.extent(someData, function(d){
+              return d.date;
+          }))
+          .range([0, spiralLength]);
 
     // yScale for the bar height
     let yScale = d3.scaleLinear()
@@ -114,7 +113,7 @@ function App() {
         .attr("x", function(d,i){
 
           let linePer = timeScale(d.date),
-              posOnLine = path.node().getPointAtLength(linePer),
+              posOnLine = path.node().getPointAtLength(spiralLength- (spiralLength/N)*i),
               angleOnLine = path.node().getPointAtLength(linePer - barWidth);
 
           d.linePer = linePer; // % distance are on the spiral
@@ -143,7 +142,7 @@ function App() {
           //     console.log("at line")
           //     return "#FFAD113E"}
           // return color(d.group);})
-            return "#4a8d0f"})
+            return Math.random() >= 0.5 ? "#840e0e" : "rgb(46,153,0)"})
         .style("stroke", "none")
         .attr("transform", function(d){
           return "rotate(" + d.a + "," + d.x  + "," + d.y + ")"; // rotate the bar
@@ -169,11 +168,12 @@ function App() {
             firstInMonth[sd] = 1;
             return true;
           }
-          return false;
+          return true;
         })
         .text(function(d){
           let month = d.date.getMonth()
-          return "Jan "+(month+1);
+
+          return months[month] +" "+  d.date.getDay();
         })
         // place text along spiral
         .attr("xlink:href", "#spiral")
@@ -231,15 +231,15 @@ function App() {
 
         document.getElementById('chart').innerHTML="";
         d3.selectAll("svg > *").remove();
-        const months = [1,2,3];
+
        let randomVar = Math.floor(Math.random() * 4);
        console.log("randon",randomVar)
-         N = months[randomVar];
+
         let tempArray =[];
-        for (let i = 0; i < N; i++) {
+        for (let i = 0; i < 30; i++) {
             let currentDate = new Date();
-            currentDate.setDate(currentDate.getDate() + i);
-            console.log("in button")
+            currentDate.setDate(currentDate.getDate() - i);
+            console.log("in button",currentDate)
             tempArray.push({
                 date: currentDate,
                 value: Math.random(),
