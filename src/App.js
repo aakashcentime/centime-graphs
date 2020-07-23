@@ -219,7 +219,9 @@ function App() {
 
           tooltip.style('display', 'none');
           tooltip.style('opacity',0);
-        });
+        }).on('click',function (d) {
+            console.log(d)
+    });
 
   },[someData]);
 
