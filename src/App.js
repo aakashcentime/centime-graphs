@@ -36,11 +36,11 @@ function App() {
     //     .attr("cy", value => value * 2)
     //     .attr("stroke", "red");
 
-    let width = 500,
-        height = 500,
+    let width = 600,
+        height = 600,
         start = 0,
         end = 2.25,
-        numSpirals = 3
+        numSpirals = 4
     let margin = {top:50,bottom:50,left:50,right:50};
 
     let theta = function(r) {
@@ -64,7 +64,7 @@ function App() {
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
       svg.selectAll("*").remove();
 
-    let points = d3.range(start, end + 0.001, (end - start) / 1000);
+    let points = d3.range(start, end + 0.001, (end - start) / 300);
 
     let spiral = d3.radialLine()
         .curve(d3.curveCardinal)
@@ -120,7 +120,9 @@ function App() {
           d.linePer = linePer; // % distance are on the spiral
           d.x = posOnLine.x; // x postion on the spiral
           d.y = posOnLine.y; // y position on the spiral
-
+            console.log(
+                d.x,d.y
+            )
           d.a = (Math.atan2(angleOnLine.y, angleOnLine.x) * 180 / Math.PI) - 90; //angle at the spiral position
 
           return d.x;
@@ -229,9 +231,10 @@ function App() {
 
         document.getElementById('chart').innerHTML="";
         d3.selectAll("svg > *").remove();
-        const months = [1,2,3,300];
-
-         N = months[Math.floor(Math.random() * months.length)];
+        const months = [1,2,3];
+       let randomVar = Math.floor(Math.random() * 4);
+       console.log("randon",randomVar)
+         N = months[randomVar];
         let tempArray =[];
         for (let i = 0; i < N; i++) {
             let currentDate = new Date();
@@ -243,6 +246,7 @@ function App() {
                 group: currentDate.getMonth()
             });
         }
+        console.log(tempArray)
         setSomeData(tempArray);
         
     };
