@@ -239,7 +239,7 @@ function App() {
        console.log("randon",randomVar)
 
         let tempArray =[];
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i <100; i++) {
             let currentDate = new Date();
             currentDate.setDate(currentDate.getDate() - i);
             console.log("in button",currentDate)
