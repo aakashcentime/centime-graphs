@@ -11,7 +11,7 @@ function App() {
   const [width , setWidth] = useState(500);
   const N = 300;
   let [someData, setSomeData] = useState([]);
-
+  const [textvalue,setTextvalue] = useState("empty now");
   function f(){
       let tempArray1 = [];
       for (let i = 0; i < N; i++) {
@@ -216,11 +216,11 @@ function App() {
           d3.selectAll("rect")
               .style("fill", function(d){return d.value > .5 ? "#840e0e" : "rgb(46,153,0)"})
               .style("stroke", "none")
-
           tooltip.style('display', 'none');
           tooltip.style('opacity',0);
         }).on('click',function (d) {
-            console.log(d)
+            console.log(d);
+        setTextvalue(JSON.stringify(d));
     });
 
   },[someData]);
@@ -253,7 +253,7 @@ function App() {
         setSomeData(tempArray);
         
     };
-  return (<div><div id="chart"></div><button onClick={myfunc}>hello</button></div> );
+  return (<div><div id="chart"></div><button onClick={myfunc}>hello</button><div>{textvalue}</div></div> );
 }
 
 export default App;
